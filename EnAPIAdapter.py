@@ -25,7 +25,7 @@ def set_token(arg):
     TOKEN = arg
 
 
-def get_jason_data(final_url):
+def get_json_data(final_url):
     my_final_url = final_url + str(TOKEN)
     try:
         response = urllib2.urlopen(my_final_url)
@@ -39,31 +39,31 @@ def get_jason_data(final_url):
 
 
 def get_ten_day_forecast(lat, lng, return_format, params=None):
-    final_url = TEN_DAY_BASE_URL + str(lat) +","+str(lng)+\
+    final_url = TEN_DAY_BASE_URL + str(lat) + "," +str(lng) + \
         "&locationtype=latitudelongitude&units=metric&cultureinfo=en-en&verbose=true&access_token="
 
-    json_data = get_jason_data(final_url)
+    json_data = get_json_data(final_url)
 
     if return_format == "JSON":
         return json_data
     elif return_format == "CSV":
         if params is None:
             params = DEFAULT_TEN_DAY_PARAMS
-        return convert_to_csv_ten_day(json_data,params)
+        return convert_to_csv_ten_day(lat, lng,json_data,params)
 
 
 def get_hourly_forecast(lat, lng, return_format, params=None):
     final_url = HOURLY_BASE_URL + str(lat) +","+str(lng)+\
         "&locationtype=latitudelongitude&units=english&cultureinfo=en-en&verbose=true&access_token="
 
-    json_data = get_jason_data(final_url)
+    json_data = get_json_data(final_url)
 
     if return_format == "JSON":
         return json_data
     elif return_format == "CSV":
         if params is None:
             params = DEFAULT_HOURLY_PARAMS
-        return convert_to_csv_hourly(json_data,params)
+        return convert_to_csv_hourly(lat, lng,json_data,params)
 
 
 def return_token():
@@ -78,7 +78,7 @@ def return_token():
     return token
 
 
-def convert_to_csv_ten_day(json_data,params):
+def convert_to_csv_ten_day(lat, lng,json_data,params):
     json_data= json_data["dailyForecastPeriods"]
     csv_string = ""
 
@@ -86,20 +86,20 @@ def convert_to_csv_ten_day(json_data,params):
         for count in range(len(params)):
             csv_string += str(p[params[count]]) + ";"
 
-        csv_string = csv_string[:len(csv_string)-2]
+        csv_string += "%s;%s" % (str(lat),str(lng))
         csv_string += "\n"
 
     return csv_string
 
 
-def convert_to_csv_hourly(json_data,params):
+def convert_to_csv_hourly(lat, lng,json_data,params):
     json_data= json_data["hourlyForecastPeriod"]
     csv_string = ""
 
     for p in range(len(params)):
             csv_string += str(json_data[0][params[p]]) + ";"
 
-    csv_string = csv_string[:len(csv_string)-2]
+    csv_string += "%s;%s" % (str(lat),str(lng))
     csv_string += "\n"
 
     return csv_string
