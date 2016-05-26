@@ -1,23 +1,24 @@
 import json
 import urllib2
+
 global TOKEN
 TOKEN = ""
 
 BASE_URL_GOOGLE = "http://maps.google.com/maps/api/geocode/json?address="
 TOKEN_BASE_URL = "https://thepulseapi.earthnetworks.com/oauth20/token?grant_type=client_credentials&client_id="
-CLIENT_ID = "***"
-CLIENT_SECRET = "***"
+CLIENT_ID = "9ac974dff4db410d913a6bc261fb061b"
+CLIENT_SECRET = "beca86f5668a49228086dda66a1f5d5a"
 TEN_DAY_BASE_URL = "https://thepulseapi.earthnetworks.com/data/forecasts/v1/daily?location="
 HOURLY_BASE_URL = "https://thepulseapi.earthnetworks.com/getHourly6DayForecast/data/forecasts/v1/hourly?location="
 
-DEFAULT_HOURLY_PARAMS = ["forecastDateUtcStr","cloudCoverPercent","description","dewPoint","feelsLike",
-                         "forecastDateLocalStr","adjustedPrecipProbability","iconCode","precipCode","precipProbability",
-                         "precipRate","relativeHumidity","temperature","thunderstormProbability","windDirectionDegrees",
-                         "windSpeed","surfacePressure","snowRate","globeTemperature","wetBulbTemperature"]
+DEFAULT_HOURLY_PARAMS = ["forecastDateUtcStr", "cloudCoverPercent", "description", "dewPoint", "feelsLike",
+                         "forecastDateLocalStr", "adjustedPrecipProbability", "iconCode", "precipCode", "precipProbability",
+                         "precipRate", "relativeHumidity", "temperature", "thunderstormProbability", "windDirectionDegrees",
+                         "windSpeed", "surfacePressure", "snowRate", "globeTemperature", "wetBulbTemperature"]
 
-DEFAULT_TEN_DAY_PARAMS = ["forecastDateUtcStr","dewPoint","iconCode","precipCode","precipProbability","relativeHumidity",
-                          "summaryDescription","temperature","thunderstormProbability","windDirectionDegrees","windSpeed",
-                          "snowAmountMm","detailedDescription","forecastDateLocalStr","cloudCoverPercent","isNightTimePeriod"]
+DEFAULT_TEN_DAY_PARAMS = ["forecastDateUtcStr", "dewPoint", "iconCode", "precipCode", "precipProbability", "relativeHumidity",
+                          "summaryDescription", "temperature", "thunderstormProbability", "windDirectionDegrees", "windSpeed",
+                          "snowAmountMm", "detailedDescription", "forecastDateLocalStr", "cloudCoverPercent", "isNightTimePeriod"]
 
 
 def set_token(arg):
@@ -39,7 +40,7 @@ def get_json_data(final_url):
 
 
 def get_ten_day_forecast(lat, lng, return_format, params=None):
-    final_url = TEN_DAY_BASE_URL + str(lat) + "," +str(lng) + \
+    final_url = TEN_DAY_BASE_URL + str(lat) + "," + str(lng) + \
         "&locationtype=latitudelongitude&units=metric&cultureinfo=en-en&verbose=true&access_token="
 
     json_data = get_json_data(final_url)
@@ -49,11 +50,11 @@ def get_ten_day_forecast(lat, lng, return_format, params=None):
     elif return_format == "CSV":
         if params is None:
             params = DEFAULT_TEN_DAY_PARAMS
-        return convert_to_csv_ten_day(lat, lng,json_data,params)
+        return convert_to_csv_ten_day(lat, lng, json_data, params)
 
 
 def get_hourly_forecast(lat, lng, return_format, params=None):
-    final_url = HOURLY_BASE_URL + str(lat) +","+str(lng)+\
+    final_url = HOURLY_BASE_URL + str(lat) + "," + str(lng) + \
         "&locationtype=latitudelongitude&units=english&cultureinfo=en-en&verbose=true&access_token="
 
     json_data = get_json_data(final_url)
@@ -63,7 +64,7 @@ def get_hourly_forecast(lat, lng, return_format, params=None):
     elif return_format == "CSV":
         if params is None:
             params = DEFAULT_HOURLY_PARAMS
-        return convert_to_csv_hourly(lat, lng,json_data,params)
+        return convert_to_csv_hourly(lat, lng, json_data, params)
 
 
 def return_token():
@@ -78,28 +79,27 @@ def return_token():
     return token
 
 
-def convert_to_csv_ten_day(lat, lng,json_data,params):
-    json_data= json_data["dailyForecastPeriods"]
+def convert_to_csv_ten_day(lat, lng, json_data, params):
+    json_data = json_data["dailyForecastPeriods"]
     csv_string = ""
 
     for p in json_data:
         for count in range(len(params)):
             csv_string += str(p[params[count]]) + ";"
-
-        csv_string += "%s;%s" % (str(lat),str(lng))
+        csv_string += "%s;%s" % (str(lat), str(lng))
         csv_string += "\n"
 
     return csv_string
 
 
-def convert_to_csv_hourly(lat, lng,json_data,params):
-    json_data= json_data["hourlyForecastPeriod"]
+def convert_to_csv_hourly(lat, lng, json_data, params):
+    json_data = json_data["hourlyForecastPeriod"]
     csv_string = ""
 
-    for p in range(len(params)):
-            csv_string += str(json_data[0][params[p]]) + ";"
-
-    csv_string += "%s;%s" % (str(lat),str(lng))
-    csv_string += "\n"
+    for row in json_data:
+        for p in range(len(params)):
+            csv_string += str(row[params[p]]) + ";"
+        csv_string += "%s;%s" % (str(lat), str(lng))
+        csv_string += "\n"
 
     return csv_string
