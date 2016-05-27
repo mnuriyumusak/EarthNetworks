@@ -4,6 +4,7 @@ import csv
 
 _OUTPUT_DIR = "output"
 
+
 def read_lat_and_lng():
     lat_lng_dict = {"names": [], "lats": [], "lngs": []}
     path = open("locations.csv", "r+")
@@ -23,7 +24,7 @@ def write_csv(csv_data, file_name):
 
 def write_ten_day_csv(params=None):
     lat_lng_dict = read_lat_and_lng()
-    file_name_ten_day = _OUTPUT_DIR + "/en-%s-10-day.csv" % time.strftime("%Y%m%d")
+    file_name_ten_day = _OUTPUT_DIR + "-en-%s-10-day.csv" % time.strftime("%Y%m%d")
 
     for i in range(len(lat_lng_dict["lats"])):
         csv_data = EnAPIAdapter.get_ten_day_forecast(lat_lng_dict["lats"][i], lat_lng_dict["lngs"][i], "CSV", params)
@@ -32,7 +33,7 @@ def write_ten_day_csv(params=None):
 
 def write_hourly_csv(params=None):
     lat_lng_dict = read_lat_and_lng()
-    file_name_hourly = _OUTPUT_DIR + "/en-%s-hourly.csv" % time.strftime("%Y%m%d")
+    file_name_hourly = _OUTPUT_DIR + "-en-%s-hourly.csv" % time.strftime("%Y%m%d")
 
     for i in range(len(lat_lng_dict["lats"])):
         csv_data = EnAPIAdapter.get_hourly_forecast(lat_lng_dict["lats"][i], lat_lng_dict["lngs"][i], "CSV", params)
